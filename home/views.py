@@ -8,4 +8,9 @@ class HomeView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['title'] = 'Sistema PDTIC'
+        from instituicoes.models import Instituicao, UnidadeAdministrativa
+        from pdtic.models import PDTIC
+        context['instituicoes_count'] = Instituicao.objects.count()
+        context['unidades_count'] = UnidadeAdministrativa.objects.count()
+        context['pdtics_count'] = PDTIC.objects.count()
         return context

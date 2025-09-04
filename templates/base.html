@@ -26,16 +26,14 @@
     <!-- Navigation -->
     <nav class="bg-white shadow-sm border-b border-gray-200">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between h-16">
-                <div class="flex">
-                    <div class="flex-shrink-0 flex items-center">
-                        <a href="{% url 'home' %}" class="text-xl font-bold text-gray-900">Sistema PDTIC</a>
-                    </div>
-                    <div class="hidden sm:ml-6 sm:flex sm:space-x-8">
-                        <a href="{% url 'instituicao_list' %}" class="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center space-x-8 w-full">
+                    <a href="{% url 'home' %}" class="text-xl font-bold text-gray-900 flex-shrink-0">Sistema PDTIC</a>
+                    <div class="flex items-center space-x-6 ml-8">
+                        <a href="{% url 'instituicao_list' %}" class="border-transparent text-gray-600 hover:text-primary-700 hover:border-primary-500 whitespace-nowrap py-2 px-3 border-b-2 font-medium text-sm transition-all duration-150">
                             Instituições
                         </a>
-                        <a href="{% url 'unidade_list' %}" class="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm">
+                        <a href="{% url 'unidade_list' %}" class="border-transparent text-gray-600 hover:text-primary-700 hover:border-primary-500 whitespace-nowrap py-2 px-3 border-b-2 font-medium text-sm transition-all duration-150">
                             Unidades
                         </a>
                     </div>

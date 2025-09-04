@@ -1,0 +1,13 @@
+<h1>{{ plano.titulo }}</h1>
+<p>Instituição: {{ plano.instituicao.nome }}</p>
+<p>Vigência: {{ plano.vigencia_inicio }} até {{ plano.vigencia_fim }}</p>
+<p>Status: {{ plano.get_status_display }}</p>
+
+<h3>Versões</h3>
+<ul>
+  {% for versao in plano.versoes.all %}
+    <li>{{ versao.numero_versao }} - {{ versao.data_aprovacao }}</li>
+  {% empty %}
+    <li>Sem versões cadastradas</li>
+  {% endfor %}
+</ul>

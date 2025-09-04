@@ -36,11 +36,19 @@
                         {% for i in object_list %}
                         <tr class="hover:bg-gray-50">
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ i.id }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ i.nome }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                <a href="{% url 'instituicao_detail' i.id %}" class="text-primary-600 hover:text-primary-900 font-medium">
+                                    {{ i.nome }}
+                                </a>
+                            </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ i.sigla|default:"—" }}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                <a href="{% url 'instituicao_update' i.id %}" 
+                                <a href="{% url 'instituicao_detail' i.id %}" 
                                    class="text-primary-600 hover:text-primary-900 mr-4">
+                                    Ver Detalhes
+                                </a>
+                                <a href="{% url 'instituicao_update' i.id %}" 
+                                   class="text-gray-600 hover:text-gray-900 mr-4">
                                     Editar
                                 </a>
                                 <a href="{% url 'instituicao_delete' i.id %}" 
