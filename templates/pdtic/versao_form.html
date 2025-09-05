@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+
+{% block title %}{% if object %}Editar{% else %}Nova{% endif %} Versão - {{ pdtic.titulo }} - Sistema PDTIC{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto">
+    <div class="md:flex md:items-center md:justify-between">
+        <div class="flex-1 min-w-0">
+            <h2 class="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:truncate">
+                {% if object %}Editar Versão{% else %}Nova Versão{% endif %}
+            </h2>
+            <p class="mt-1 text-sm text-gray-500">{{ pdtic.titulo }}</p>
+        </div>
+        <div class="mt-4 flex md:mt-0 md:ml-4">
+            <a href="{% url 'versao_list' pdtic.pk %}" 
+               class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
+                <svg class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                </svg>
+                Voltar
+            </a>
+        </div>
+    </div>
+
+    <div class="mt-8">
+        <div class="bg-white shadow rounded-lg">
+            <form method="post" enctype="multipart/form-data" class="space-y-6 p-6">
+                {% csrf_token %}
+                
+                {% if form.non_field_errors %}
+                    <div class="rounded-md bg-red-50 p-4">
+                        <div class="flex">
+                            <div class="flex-shrink-0">
+                                <svg class="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                                </svg>
+                            </div>
+                            <div class="ml-3">
+                                <h3 class="text-sm font-medium text-red-800">Erro no formulário</h3>
+                                <div class="mt-2 text-sm text-red-700">
+                                    {{ form.non_field_errors }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+
+                <div class="grid grid-cols-1 gap-6">
+                    <!-- Campo Número da Versão -->
+                    <div>
+                        <label for="{{ form.numero_versao.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                            Número da Versão <span class="text-red-500">*</span>
+                        </label>
+                        <div class="mt-1">
+                            {{ form.numero_versao }}
+                        </div>
+                        {% if form.numero_versao.errors %}
+                            <p class="mt-2 text-sm text-red-600">{{ form.numero_versao.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+
+                    <!-- Campo Data de Aprovação -->
+                    <div>
+                        <label for="{{ form.data_aprovacao.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                            Data de Aprovação
+                        </label>
+                        <div class="mt-1">
+                            {{ form.data_aprovacao }}
+                        </div>
+                        <p class="mt-1 text-sm text-gray-500">Deixe em branco se a versão ainda não foi aprovada</p>
+                        {% if form.data_aprovacao.errors %}
+                            <p class="mt-2 text-sm text-red-600">{{ form.data_aprovacao.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+
+                    <!-- Campo Documento -->
+                    <div>
+                        <label for="{{ form.documento.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                            Documento
+                        </label>
+                        <div class="mt-1">
+                            {{ form.documento }}
+                        </div>
+                        <p class="mt-1 text-sm text-gray-500">Faça upload do documento PDF desta versão</p>
+                        {% if form.documento.errors %}
+                            <p class="mt-2 text-sm text-red-600">{{ form.documento.errors.0 }}</p>
+                        {% endif %}
+                        {% if object and object.documento %}
+                            <div class="mt-2">
+                                <a href="{{ object.documento.url }}" target="_blank" class="text-primary-600 hover:text-primary-500 text-sm">
+                                    Documento atual: {{ object.documento.name|cut:"pdtic_docs/" }}
+                                </a>
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Campo Observações -->
+                    <div>
+                        <label for="{{ form.observacoes.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                            Observações
+                        </label>
+                        <div class="mt-1">
+                            {{ form.observacoes }}
+                        </div>
+                        {% if form.observacoes.errors %}
+                            <p class="mt-2 text-sm text-red-600">{{ form.observacoes.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="flex justify-end space-x-3 pt-6 border-t border-gray-200">
+                    <a href="{% url 'versao_list' pdtic.pk %}" 
+                       class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
+                        Cancelar
+                    </a>
+                    <button type="submit" 
+                            class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
+                        <svg class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                        </svg>
+                        Salvar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
