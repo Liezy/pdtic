@@ -9,13 +9,13 @@
         <p class="mt-2 text-sm text-gray-700">Lista de todas as instituições cadastradas no sistema.</p>
     </div>
     <div class="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
-        <a href="{% url 'instituicao_create' %}" 
+        <button data-modal-form data-url="{% url 'instituicao_create' %}" data-title="Nova Instituição"
            class="inline-flex items-center justify-center rounded-md border border-transparent bg-primary-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 sm:w-auto">
             <svg class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
             </svg>
             Nova Instituição
-        </a>
+        </button>
     </div>
 </div>
 
@@ -47,14 +47,14 @@
                                    class="text-primary-600 hover:text-primary-900 mr-4">
                                     Ver Detalhes
                                 </a>
-                                <a href="{% url 'instituicao_update' i.id %}" 
+                                <button data-modal-form data-url="{% url 'instituicao_update' i.id %}" data-title="Editar Instituição"
                                    class="text-gray-600 hover:text-gray-900 mr-4">
                                     Editar
-                                </a>
-                                <a href="{% url 'instituicao_delete' i.id %}" 
+                                </button>
+                                <button data-modal-form data-url="{% url 'instituicao_delete' i.id %}" data-title="Excluir Instituição"
                                    class="text-red-600 hover:text-red-900">
                                     Excluir
-                                </a>
+                                </button>
                             </td>
                         </tr>
                         {% empty %}
@@ -66,13 +66,13 @@
                                 <h3 class="mt-2 text-sm font-medium text-gray-900">Nenhuma instituição cadastrada</h3>
                                 <p class="mt-1 text-sm text-gray-500">Comece criando uma nova instituição.</p>
                                 <div class="mt-6">
-                                    <a href="{% url 'instituicao_create' %}" 
+                                    <button data-modal-form data-url="{% url 'instituicao_create' %}" data-title="Nova Instituição"
                                        class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
                                         <svg class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                                         </svg>
                                         Nova Instituição
-                                    </a>
+                                    </button>
                                 </div>
                             </td>
                         </tr>

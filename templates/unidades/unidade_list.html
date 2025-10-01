@@ -27,13 +27,13 @@
                     Voltar à Instituição
                 </a>
             {% endif %}
-            <a href="{% url 'unidade_create' %}" 
+            <button data-modal-form data-url="{% url 'unidade_create' %}" data-title="Nova Unidade"
                class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
                 <svg class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                 </svg>
                 Nova Unidade
-            </a>
+            </button>
         </div>
     </div>
     <div class="bg-white shadow rounded-lg p-6">
@@ -55,8 +55,8 @@
                         <td class="px-6 py-4 whitespace-nowrap">{{ unidade.instituicao.nome }}</td>
                     {% endif %}
                     <td class="px-6 py-4 whitespace-nowrap">
-                        <a href="{% url 'unidade_update' unidade.pk %}" class="text-primary-600 hover:underline mr-2">Editar</a>
-                        <a href="{% url 'unidade_delete' unidade.pk %}" class="text-red-600 hover:underline">Excluir</a>
+                        <button data-modal-form data-url="{% url 'unidade_update' unidade.pk %}" data-title="Editar Unidade" class="text-primary-600 hover:underline mr-2">Editar</button>
+                        <button data-modal-form data-url="{% url 'unidade_delete' unidade.pk %}" data-title="Excluir Unidade" class="text-red-600 hover:underline">Excluir</button>
                     </td>
                 </tr>
                 {% empty %}

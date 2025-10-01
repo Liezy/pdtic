@@ -1,4 +1,6 @@
 from django.shortcuts import render, get_object_or_404, redirect
+from django.http import JsonResponse
+from django.template.loader import render_to_string
 from .models import PDTIC, VersaoPDTIC
 from .forms import PDTICForm, VersaoPDTICForm
 from instituicoes.models import Instituicao
@@ -23,10 +25,23 @@ def pdtic_create(request):
     if request.method == "POST":
         form = PDTICForm(request.POST)
         if form.is_valid():
-            form.save()
-            return redirect("pdtic_list")
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                form.save()
+                return JsonResponse({'success': True})
+            else:
+                form.save()
+                return redirect("pdtic_list")
+        else:
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                html = render_to_string('pdtic/pdtic_form_modal.html', {'form': form}, request=request)
+                return JsonResponse({'success': False, 'form_html': html})
+            else:
+                return render(request, "pdtic/pdtic_form.html", {"form": form})
     else:
         form = PDTICForm()
+    
+    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        return render(request, "pdtic/pdtic_form_modal.html", {"form": form})
     return render(request, "pdtic/pdtic_form.html", {"form": form})
 
 
@@ -35,10 +50,23 @@ def pdtic_update(request, pk):
     if request.method == "POST":
         form = PDTICForm(request.POST, instance=plano)
         if form.is_valid():
-            form.save()
-            return redirect("pdtic_detail", pk=plano.pk)
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                form.save()
+                return JsonResponse({'success': True})
+            else:
+                form.save()
+                return redirect("pdtic_detail", pk=plano.pk)
+        else:
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                html = render_to_string('pdtic/pdtic_form_modal.html', {'form': form, 'object': plano}, request=request)
+                return JsonResponse({'success': False, 'form_html': html})
+            else:
+                return render(request, "pdtic/pdtic_form.html", {"form": form, "object": plano})
     else:
         form = PDTICForm(instance=plano)
+    
+    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        return render(request, "pdtic/pdtic_form_modal.html", {"form": form, "object": plano})
     return render(request, "pdtic/pdtic_form.html", {"form": form, "object": plano})
 
 
