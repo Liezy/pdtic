@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  # Banco de dados PostgreSQL
+  db:
+    image: postgres:13
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: pdtic_db
+      POSTGRES_USER: pdtic_user
+      POSTGRES_PASSWORD: pdtic_password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  # Aplicação Django
+  web:
+    build: .
+    restart: unless-stopped
+    volumes:
+      - .:/app
+      - static_volume:/app/staticfiles
+    ports:
+      - "8000:8000"
+    environment:
+      # Configurações do banco para Docker
+      DB_ENGINE: django.db.backends.postgresql
+      DB_NAME: pdtic_db
+      DB_USER: pdtic_user
+      DB_PASSWORD: pdtic_password
+      DB_HOST: db
+      DB_PORT: 5432
+      DEBUG: 'True'
+    depends_on:
+      - db
+
+volumes:
+  postgres_data:
+  static_volume:
