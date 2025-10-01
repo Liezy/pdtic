@@ -10,7 +10,18 @@ class HomeView(TemplateView):
         context['title'] = 'Sistema PDTIC'
         from instituicoes.models import Instituicao, UnidadeAdministrativa
         from pdtic.models import PDTIC
-        context['instituicoes_count'] = Instituicao.objects.count()
-        context['unidades_count'] = UnidadeAdministrativa.objects.count()
-        context['pdtics_count'] = PDTIC.objects.count()
+        
+        # Se há uma instituição ativa, filtra os dados por ela
+        if hasattr(self.request, 'instituicao_ativa'):
+            instituicao_ativa = self.request.instituicao_ativa
+            context['unidades_count'] = UnidadeAdministrativa.objects.filter(instituicao=instituicao_ativa).count()
+            context['pdtics_count'] = PDTIC.objects.filter(instituicao=instituicao_ativa).count()
+            # No contexto de uma instituição específica, não mostra contagem total de instituições
+            context['instituicoes_count'] = 1  # A própria instituição ativa
+        else:
+            # Modo global (sem instituição ativa)
+            context['instituicoes_count'] = Instituicao.objects.count()
+            context['unidades_count'] = UnidadeAdministrativa.objects.count()
+            context['pdtics_count'] = PDTIC.objects.count()
+            
         return context

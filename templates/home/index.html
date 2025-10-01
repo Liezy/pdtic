@@ -1,14 +1,14 @@
 {% extends "base.html" %}
 
-{% block title %}Dashboard PDTIC{% endblock %}
+{% block title %}Home{% endblock %}
+{% block page_title %}Home{% endblock %}
 
 {% block content %}
-<div class="min-h-screen bg-gray-50">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+<div class="max-w-7xl mx-auto">
         <!-- Header -->
         <div class="mb-8">
-            <h1 class="text-3xl font-bold text-gray-900">Dashboard PDTIC</h1>
-            <p class="mt-2 text-sm text-gray-600">Visão geral do sistema de gerenciamento</p>
+            <h1 class="text-3xl font-bold text-gray-900">Home</h1>
+            <p class="mt-2 text-sm text-gray-600">Visão geral do sistema</p>
         </div>
 
         <!-- Estatísticas Principais -->
@@ -87,33 +87,237 @@
             </div>
         </div>
 
-        <!-- Ações Rápidas -->
-        <div class="bg-white shadow rounded-lg">
-            <div class="px-4 py-5 sm:p-6">
-                <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">Ações Rápidas</h3>
-                <div class="grid grid-cols-1 gap-4 sm:grid-cols-4">
-                    <a href="{% url 'instituicao_list' %}" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
-                        <svg class="-ml-1 mr-2 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                        </svg>
-                        Gerenciar Instituições
-                    </a>
-                    <a href="{% url 'unidade_list' %}" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
-                        <svg class="-ml-1 mr-2 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                        </svg>
-                        Gerenciar Unidades
-                    </a>
-                    <a href="{% url 'pdtic_list' %}" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                        <svg class="-ml-1 mr-2 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                        </svg>
-                        Gerenciar PDTICs
-                    </a>
-                </div>
+        <!-- Gráficos Home -->
+        <div class="grid grid-cols-1 gap-6 lg:grid-cols-2 mb-8">
+            <!-- Gráfico de PDTICs por Status -->
+            <div class="bg-white shadow rounded-lg p-6">
+                <h3 class="text-lg font-medium text-gray-900 mb-4">PDTICs por Status</h3>
+                <div id="chart-pdtics-status" style="height: 300px;"></div>
+            </div>
+
+            <!-- Gráfico de Evolução Mensal -->
+            <div class="bg-white shadow rounded-lg p-6">
+                <h3 class="text-lg font-medium text-gray-900 mb-4">Evolução de Criação de PDTICs</h3>
+                <div id="chart-pdtics-timeline" style="height: 300px;"></div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
+            <!-- Gráfico de Instituições por Região -->
+            <div class="bg-white shadow rounded-lg p-6">
+                <h3 class="text-lg font-medium text-gray-900 mb-4">Distribuição de Instituições por Região</h3>
+                <div id="chart-instituicoes-regiao" style="height: 300px;"></div>
+            </div>
+
+            <!-- Gráfico de Unidades por Tipo -->
+            <div class="bg-white shadow rounded-lg p-6">
+                <h3 class="text-lg font-medium text-gray-900 mb-4">Unidades por Tipo</h3>
+                <div id="chart-unidades-tipo" style="height: 300px;"></div>
             </div>
         </div>
     </div>
-</div>
+
+    <!-- Scripts dos Gráficos -->
+    <script>
+        // Dados fictícios
+        const homeData = {
+            pdtics_status: [
+                { name: 'Rascunho', y: 35, color: '#6B7280' },
+                { name: 'Em Elaboração', y: 28, color: '#F59E0B' },
+                { name: 'Aprovado', y: 22, color: '#10B981' },
+                { name: 'Publicado', y: 15, color: '#3B82F6' }
+            ],
+            pdtics_timeline: {
+                categories: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'],
+                series: [
+                    { name: 'Novos PDTICs', data: [3, 5, 2, 8, 4, 6, 7, 3, 9, 5, 4, 6], color: '#3B82F6' },
+                    { name: 'PDTICs Aprovados', data: [1, 3, 4, 2, 6, 3, 5, 7, 4, 8, 3, 5], color: '#10B981' }
+                ]
+            },
+            instituicoes_regiao: [
+                { name: 'Sudeste', y: 45, color: '#3B82F6' },
+                { name: 'Sul', y: 20, color: '#10B981' },
+                { name: 'Nordeste', y: 18, color: '#F59E0B' },
+                { name: 'Centro-Oeste', y: 12, color: '#EF4444' },
+                { name: 'Norte', y: 5, color: '#8B5CF6' }
+            ],
+            unidades_tipo: {
+                categories: ['Ministérios', 'Secretarias', 'Autarquias', 'Fundações', 'Empresas Públicas', 'Outros'],
+                data: [25, 18, 15, 12, 8, 22]
+            }
+        };
+
+        // Configuração global do Highcharts
+        Highcharts.setOptions({
+            colors: ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#EC4899', '#14B8A6', '#F97316'],
+            chart: {
+                backgroundColor: 'transparent',
+                style: {
+                    fontFamily: 'Inter, system-ui, sans-serif'
+                }
+            },
+            title: {
+                style: {
+                    color: '#1F2937',
+                    fontWeight: '600'
+                }
+            },
+            credits: {
+                enabled: false
+            },
+            exporting: {
+                enabled: false
+            }
+        });
+
+        // Gráfico PDTICs por Status (Pizza)
+        Highcharts.chart('chart-pdtics-status', {
+            chart: {
+                type: 'pie',
+                height: 300
+            },
+            title: {
+                text: ''
+            },
+            tooltip: {
+                pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b> ({point.y})'
+            },
+            accessibility: {
+                point: {
+                    valueSuffix: '%'
+                }
+            },
+            plotOptions: {
+                pie: {
+                    allowPointSelect: true,
+                    cursor: 'pointer',
+                    dataLabels: {
+                        enabled: true,
+                        format: '<b>{point.name}</b>: {point.percentage:.1f} %'
+                    }
+                }
+            },
+            series: [{
+                name: 'PDTICs',
+                colorByPoint: true,
+                data: homeData.pdtics_status
+            }]
+        });
+
+        // Gráfico Evolução de PDTICs (Linha)
+        Highcharts.chart('chart-pdtics-timeline', {
+            chart: {
+                type: 'line',
+                height: 300
+            },
+            title: {
+                text: ''
+            },
+            xAxis: {
+                categories: homeData.pdtics_timeline.categories,
+                title: {
+                    text: 'Meses'
+                }
+            },
+            yAxis: {
+                title: {
+                    text: 'Quantidade'
+                }
+            },
+            tooltip: {
+                shared: true,
+                crosshairs: true
+            },
+            plotOptions: {
+                line: {
+                    dataLabels: {
+                        enabled: false
+                    },
+                    enableMouseTracking: true
+                }
+            },
+            series: homeData.pdtics_timeline.series
+        });
+
+        // Gráfico Instituições por Região (Barras)
+        Highcharts.chart('chart-instituicoes-regiao', {
+            chart: {
+                type: 'column',
+                height: 300
+            },
+            title: {
+                text: ''
+            },
+            xAxis: {
+                type: 'category',
+                title: {
+                    text: 'Regiões'
+                }
+            },
+            yAxis: {
+                title: {
+                    text: 'Quantidade de Instituições'
+                }
+            },
+            tooltip: {
+                pointFormat: 'Instituições: <b>{point.y}</b>'
+            },
+            plotOptions: {
+                column: {
+                    pointPadding: 0.2,
+                    borderWidth: 0,
+                    dataLabels: {
+                        enabled: true
+                    }
+                }
+            },
+            series: [{
+                name: 'Instituições',
+                colorByPoint: true,
+                data: homeData.instituicoes_regiao
+            }]
+        });
+
+        // Gráfico Unidades por Tipo (Barras Horizontais)
+        Highcharts.chart('chart-unidades-tipo', {
+            chart: {
+                type: 'bar',
+                height: 300
+            },
+            title: {
+                text: ''
+            },
+            xAxis: {
+                categories: homeData.unidades_tipo.categories,
+                title: {
+                    text: null
+                }
+            },
+            yAxis: {
+                min: 0,
+                title: {
+                    text: 'Quantidade de Unidades',
+                    align: 'high'
+                },
+                labels: {
+                    overflow: 'justify'
+                }
+            },
+            tooltip: {
+                valueSuffix: ' unidades'
+            },
+            plotOptions: {
+                bar: {
+                    dataLabels: {
+                        enabled: true
+                    }
+                }
+            },
+            series: [{
+                name: 'Unidades',
+                data: homeData.unidades_tipo.data,
+                color: '#3B82F6'
+            }]
+        });
+    </script>
 {% endblock %}

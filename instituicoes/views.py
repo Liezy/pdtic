@@ -3,6 +3,7 @@ from django.views.generic import ListView, CreateView, UpdateView, DeleteView, D
 from django.http import JsonResponse
 from django.template.loader import render_to_string
 from .models import Instituicao, UnidadeAdministrativa
+from .forms import InstituicaoForm, UnidadeAdministrativaForm
 
 # --- Instituição ---
 class InstituicaoList(ListView):
@@ -21,7 +22,7 @@ class InstituicaoDetail(DetailView):
 
 class InstituicaoCreate(CreateView):
     model = Instituicao
-    fields = ['nome', 'sigla']
+    form_class = InstituicaoForm
     success_url = reverse_lazy('instituicao_list')
     
     def get_template_names(self):
@@ -48,7 +49,7 @@ class InstituicaoCreate(CreateView):
 
 class InstituicaoUpdate(UpdateView):
     model = Instituicao
-    fields = ['nome', 'sigla']
+    form_class = InstituicaoForm
     success_url = reverse_lazy('instituicao_list')
     
     def get_template_names(self):
@@ -100,6 +101,11 @@ class UnidadeList(ListView):
         # Se vier de uma instituição específica, filtra por ela
         if 'instituicao_pk' in self.kwargs:
             return self.model.objects.filter(instituicao_id=self.kwargs['instituicao_pk'])
+        
+        # Se há uma instituição ativa na sessão, filtra por ela
+        if hasattr(self.request, 'instituicao_ativa'):
+            return self.model.objects.filter(instituicao=self.request.instituicao_ativa)
+            
         return self.model.objects.all()
     
     def get_context_data(self, **kwargs):
@@ -107,13 +113,27 @@ class UnidadeList(ListView):
         # Se vier de uma instituição específica, adiciona ela ao contexto
         if 'instituicao_pk' in self.kwargs:
             context['instituicao'] = Instituicao.objects.get(pk=self.kwargs['instituicao_pk'])
+        elif hasattr(self.request, 'instituicao_ativa'):
+            context['instituicao'] = self.request.instituicao_ativa
         return context
 
 class UnidadeCreate(CreateView):
     model = UnidadeAdministrativa
-    fields = ['nome', 'instituicao']
+    form_class = UnidadeAdministrativaForm
     template_name = 'unidades/unidade_form.html'
     success_url = reverse_lazy('unidade_list')
+    
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        if hasattr(self.request, 'instituicao_ativa'):
+            kwargs['instituicao_ativa'] = self.request.instituicao_ativa
+        return kwargs
+    
+    def form_valid(self, form):
+        # Se há uma instituição ativa, define ela automaticamente
+        if hasattr(self.request, 'instituicao_ativa'):
+            form.instance.instituicao = self.request.instituicao_ativa
+        return super().form_valid(form)
     
     def get_template_names(self):
         if self.request.headers.get('X-Requested-With') == 'XMLHttpRequest':
@@ -139,9 +159,24 @@ class UnidadeCreate(CreateView):
 
 class UnidadeUpdate(UpdateView):
     model = UnidadeAdministrativa
-    fields = ['nome', 'instituicao']
+    form_class = UnidadeAdministrativaForm
     template_name = 'unidades/unidade_form.html'
     success_url = reverse_lazy('unidade_list')
+    
+    def get_object(self, queryset=None):
+        obj = super().get_object(queryset)
+        # Garante que só pode editar unidades da instituição ativa
+        if hasattr(self.request, 'instituicao_ativa'):
+            if obj.instituicao != self.request.instituicao_ativa:
+                from django.http import Http404
+                raise Http404("Unidade não encontrada")
+        return obj
+    
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        if hasattr(self.request, 'instituicao_ativa'):
+            kwargs['instituicao_ativa'] = self.request.instituicao_ativa
+        return kwargs
     
     def get_template_names(self):
         if self.request.headers.get('X-Requested-With') == 'XMLHttpRequest':

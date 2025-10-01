@@ -1,0 +1,215 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token }}">
+    <title>{{ title }} - Sistema PDTIC</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#eff6ff',
+                            100: '#dbeafe',
+                            200: '#bfdbfe',
+                            300: '#93c5fd',
+                            400: '#60a5fa',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                            800: '#1e40af',
+                            900: '#1e3a8a',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <div class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-4xl w-full space-y-8">
+            <!-- Header -->
+            <div class="text-center">
+                <svg class="mx-auto h-16 w-16 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                </svg>
+                <h1 class="mt-6 text-3xl font-extrabold text-gray-900">Sistema PDTIC</h1>
+                <h2 class="mt-2 text-xl font-medium text-gray-600">{{ title }}</h2>
+                <p class="mt-2 text-sm text-gray-500">
+                    Escolha a instituição para acessar o sistema de gestão
+                </p>
+            </div>
+
+            <!-- Lista de Instituições -->
+            <div class="bg-white shadow-xl rounded-lg overflow-hidden">
+                <div class="px-6 py-4 bg-gray-50 border-b border-gray-200">
+                    <h3 class="text-lg font-medium text-gray-900">Instituições Disponíveis</h3>
+                </div>
+
+                {% if instituicoes %}
+                    <div class="divide-y divide-gray-200">
+                        {% for instituicao in instituicoes %}
+                            <div class="p-6 hover:bg-gray-50 transition-colors duration-200">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center space-x-4">
+                                        <!-- Indicador de cor -->
+                                        <div 
+                                            class="w-4 h-4 rounded-full border-2 border-white shadow-lg"
+                                            style="background-color: {{ instituicao.cor_tema }};"
+                                        ></div>
+                                        <div>
+                                            <h4 class="text-lg font-medium text-gray-900">{{ instituicao.nome }}</h4>
+                                            {% if instituicao.sigla %}
+                                                <p class="text-sm text-gray-500">{{ instituicao.sigla }}</p>
+                                            {% endif %}
+                                            <p class="text-xs text-gray-400 mt-1">
+                                                Cor tema: {{ instituicao.cor_tema }}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <button 
+                                        onclick="selecionarInstituicao({{ instituicao.id }}, '{{ instituicao.cor_tema }}')"
+                                        class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white shadow-sm hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 transition-all duration-200"
+                                        style="background-color: {{ instituicao.cor_tema }}; --tw-ring-color: {{ instituicao.cor_tema }};"
+                                    >
+                                        Acessar
+                                        <svg class="ml-2 -mr-1 w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="p-12 text-center">
+                        <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                        </svg>
+                        <h3 class="mt-4 text-lg font-medium text-gray-900">Nenhuma instituição encontrada</h3>
+                        <p class="mt-2 text-sm text-gray-500">
+                            Contacte o administrador do sistema para cadastrar instituições.
+                        </p>
+                        <div class="mt-6">
+                            <a href="/admin/" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
+                                Acessar Admin
+                            </a>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Footer -->
+            <div class="text-center">
+                <p class="text-xs text-gray-400">
+                    Sistema de Gestão de Planos Diretores de Tecnologia da Informação e Comunicação
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Modal -->
+    <div id="loadingModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden">
+        <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+            <div class="mt-3 text-center">
+                <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-primary-100">
+                    <svg class="animate-spin h-6 w-6 text-primary-600" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                </div>
+                <h3 class="text-lg leading-6 font-medium text-gray-900 mt-4">Carregando...</h3>
+                <div class="mt-2 px-7 py-3">
+                    <p class="text-sm text-gray-500">
+                        Acessando o sistema da instituição selecionada...
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function selecionarInstituicao(instituicaoId, corTema) {
+            // Mostra o modal de loading
+            document.getElementById('loadingModal').classList.remove('hidden');
+            
+            // Faz a requisição AJAX
+            fetch(`/ativar-instituicao/${instituicaoId}/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCSRFToken(),
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => {
+                console.log('Response status:', response.status);
+                console.log('Response headers:', response.headers.get('content-type'));
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                // Verifica se a resposta é JSON
+                const contentType = response.headers.get('content-type');
+                if (!contentType || !contentType.includes('application/json')) {
+                    throw new Error('Resposta não é JSON');
+                }
+                
+                return response.json();
+            })
+            .then(data => {
+                console.log('Response data:', data);
+                if (data.status === 'success') {
+                    // Aplica a cor tema temporariamente
+                    document.documentElement.style.setProperty('--primary-color', corTema);
+                    
+                    // Redireciona após um breve delay
+                    setTimeout(() => {
+                        window.location.href = data.redirect_url;
+                    }, 500);
+                } else {
+                    // Esconde o modal de loading
+                    document.getElementById('loadingModal').classList.add('hidden');
+                    alert(`Erro: ${data.message || 'Erro ao selecionar instituição'}`);
+                }
+            })
+            .catch(error => {
+                console.error('Erro completo:', error);
+                document.getElementById('loadingModal').classList.add('hidden');
+                alert(`Erro: ${error.message}`);
+            });
+        }
+
+        // Função para obter o CSRF token
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        // Função alternativa para obter CSRF token do meta tag
+        function getCSRFToken() {
+            const metaTag = document.querySelector('meta[name="csrf-token"]');
+            if (metaTag) {
+                return metaTag.getAttribute('content');
+            }
+            return getCookie('csrftoken');
+        }
+    </script>
+</body>
+</html>

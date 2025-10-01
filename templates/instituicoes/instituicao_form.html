@@ -1,28 +1,12 @@
-{% extends "base.html" %}
+{% extends "base_form.html" %}
 
 {% block title %}{% if object %}Editar{% else %}Nova{% endif %} Instituição - Sistema PDTIC{% endblock %}
+{% block page_title %}{% if object %}Editar Instituição{% else %}Nova Instituição{% endif %}{% endblock %}
 
-{% block content %}
-<div class="max-w-2xl mx-auto">
-    <div class="md:flex md:items-center md:justify-between">
-        <div class="flex-1 min-w-0">
-            <h2 class="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:truncate">
-                {% if object %}Editar Instituição{% else %}Nova Instituição{% endif %}
-            </h2>
-        </div>
-        <div class="mt-4 flex md:mt-0 md:ml-4">
-            <a href="{% url 'instituicao_list' %}" 
-               class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
-                <svg class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                </svg>
-                Voltar
-            </a>
-        </div>
-    </div>
+{% block form_title %}{% if object %}Editar Instituição{% else %}Nova Instituição{% endif %}{% endblock %}
+{% block back_url %}{% url 'instituicao_list' %}{% endblock %}
 
-    <div class="mt-8">
-        <div class="bg-white shadow rounded-lg">
+{% block form_content %}
             <form method="post" class="space-y-6 p-6">
                 {% csrf_token %}
                 
@@ -97,7 +81,4 @@
                     </button>
                 </div>
             </form>
-        </div>
-    </div>
-</div>
 {% endblock %}

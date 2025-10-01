@@ -3,8 +3,9 @@ from .models import Instituicao, UnidadeAdministrativa
 
 @admin.register(Instituicao)
 class InstituicaoAdmin(admin.ModelAdmin):
-    list_display = ('id', 'nome', 'sigla')
+    list_display = ('id', 'nome', 'sigla', 'cor_tema')
     search_fields = ('nome', 'sigla')
+    fields = ('nome', 'sigla', 'cor_tema')
 
 @admin.register(UnidadeAdministrativa)
 class UnidadeAdmin(admin.ModelAdmin):

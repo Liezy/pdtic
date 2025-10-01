@@ -14,6 +14,16 @@ class PDTICForm(forms.ModelForm):
                 'class': 'block w-full h-12 border border-gray-300 bg-gray-50 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-600 sm:text-sm text-gray-900'
             }),
         }
+        
+    def __init__(self, *args, **kwargs):
+        # Extrai instituição ativa se fornecida
+        instituicao_ativa = kwargs.pop('instituicao_ativa', None)
+        super().__init__(*args, **kwargs)
+        
+        # Se há uma instituição ativa, oculta o campo instituição
+        if instituicao_ativa:
+            self.fields['instituicao'].widget = forms.HiddenInput()
+            self.fields['instituicao'].initial = instituicao_ativa
 
 
 class VersaoPDTICForm(forms.ModelForm):

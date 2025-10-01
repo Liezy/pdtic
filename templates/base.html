@@ -5,66 +5,190 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Sistema PDTIC{% endblock %}</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+    <script src="https://code.highcharts.com/modules/exporting.js"></script>
+    <script src="https://code.highcharts.com/modules/export-data.js"></script>
     <script>
+        // Cor tema dinâmica da instituição
+        const corTema = '{{ cor_tema|default:"#3B82F6" }}';
+        
+        // Função para converter hex para RGB
+        function hexToRgb(hex) {
+            const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+            return result ? {
+                r: parseInt(result[1], 16),
+                g: parseInt(result[2], 16),
+                b: parseInt(result[3], 16)
+            } : null;
+        }
+        
+        // Gera variações da cor tema
+        function gerarCoresTema(cor) {
+            const rgb = hexToRgb(cor);
+            if (!rgb) return { 50: '#eff6ff', 500: '#3b82f6', 600: '#2563eb', 700: '#1d4ed8' };
+            
+            return {
+                50: `rgb(${Math.min(255, rgb.r + 60)}, ${Math.min(255, rgb.g + 60)}, ${Math.min(255, rgb.b + 60)})`,
+                500: cor,
+                600: `rgb(${Math.max(0, rgb.r - 20)}, ${Math.max(0, rgb.g - 20)}, ${Math.max(0, rgb.b - 20)})`,
+                700: `rgb(${Math.max(0, rgb.r - 40)}, ${Math.max(0, rgb.g - 40)}, ${Math.max(0, rgb.b - 40)})`
+            };
+        }
+        
+        const coresPrimarias = gerarCoresTema(corTema);
+        
         tailwind.config = {
             theme: {
                 extend: {
                     colors: {
-                        primary: {
-                            50: '#eff6ff',
-                            500: '#3b82f6',
-                            600: '#2563eb',
-                            700: '#1d4ed8',
-                        }
+                        primary: coresPrimarias
                     }
                 }
             }
         }
+        
+        // Aplica variáveis CSS customizadas
+        document.documentElement.style.setProperty('--cor-tema', corTema);
+        document.documentElement.style.setProperty('--cor-tema-50', coresPrimarias[50]);
+        document.documentElement.style.setProperty('--cor-tema-600', coresPrimarias[600]);
+        document.documentElement.style.setProperty('--cor-tema-700', coresPrimarias[700]);
     </script>
 </head>
-<body class="bg-gray-50 min-h-screen">
-    <!-- Navigation -->
-    <nav class="bg-white shadow-sm border-b border-gray-200">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex items-center justify-between h-16">
-                <div class="flex items-center space-x-8 w-full">
-                    <a href="{% url 'home' %}" class="text-xl font-bold text-gray-900 flex-shrink-0">Sistema PDTIC</a>
-                    <div class="flex items-center space-x-6 ml-8">
-                        <a href="{% url 'instituicao_list' %}" class="border-transparent text-gray-600 hover:text-primary-700 hover:border-primary-500 whitespace-nowrap py-2 px-3 border-b-2 font-medium text-sm transition-all duration-150">
-                            Instituições
-                        </a>
-                        <a href="{% url 'unidade_list' %}" class="border-transparent text-gray-600 hover:text-primary-700 hover:border-primary-500 whitespace-nowrap py-2 px-3 border-b-2 font-medium text-sm transition-all duration-150">
-                            Unidades
-                        </a>
-                        <a href="{% url 'pdtic_list' %}" class="border-transparent text-gray-600 hover:text-primary-700 hover:border-primary-500 whitespace-nowrap py-2 px-3 border-b-2 font-medium text-sm transition-all duration-150">
-                            PDTICs
-                        </a>
-                    </div>
+<body class="bg-gray-50 min-h-screen flex">
+    <!-- Sidebar -->
+    <div class="fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out lg:translate-x-0" id="sidebar">
+        <div class="flex items-center justify-between h-16 px-6 border-b border-gray-200">
+            <a href="{% url 'home' %}" class="text-xl font-bold text-gray-900">Sistema PDTIC</a>
+            <button id="sidebar-close" class="lg:hidden p-1 rounded-md text-gray-400 hover:text-gray-600">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+        </div>
+        
+        <!-- Navigation Menu -->
+        <nav class="mt-6 px-3">
+            <div class="space-y-1">
+                <!-- Dashboard -->
+                <a href="{% url 'home' %}" class="flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-700 hover:text-gray-900 hover:bg-gray-100 transition-colors group">
+                    <svg class="flex-shrink-0 -ml-1 mr-3 h-5 w-5 text-gray-400 group-hover:text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5a2 2 0 012-2h4a2 2 0 012 2v6H8V5z" />
+                    </svg>
+                    Dashboard
+                </a>
+
+                <!-- Instituições -->
+                <a href="{% url 'instituicao_list' %}" class="flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-700 hover:text-gray-900 hover:bg-gray-100 transition-colors group">
+                    <svg class="flex-shrink-0 -ml-1 mr-3 h-5 w-5 text-gray-400 group-hover:text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                    </svg>
+                    Instituições
+                </a>
+
+                <!-- Unidades -->
+                <a href="{% url 'unidade_list' %}" class="flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-700 hover:text-gray-900 hover:bg-gray-100 transition-colors group">
+                    <svg class="flex-shrink-0 -ml-1 mr-3 h-5 w-5 text-gray-400 group-hover:text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                    Unidades
+                </a>
+
+                <!-- PDTICs -->
+                <a href="{% url 'pdtic_list' %}" class="flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-700 hover:text-gray-900 hover:bg-gray-100 transition-colors group">
+                    <svg class="flex-shrink-0 -ml-1 mr-3 h-5 w-5 text-gray-400 group-hover:text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    PDTICs
+                </a>
+            </div>
+
+            <!-- Seção Administração -->
+            <div class="mt-8">
+                <h3 class="px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                    Administração
+                </h3>
+                <div class="mt-2 space-y-1">
+                    <a href="/admin/" class="flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-700 hover:text-gray-900 hover:bg-gray-100 transition-colors group">
+                        <svg class="flex-shrink-0 -ml-1 mr-3 h-5 w-5 text-gray-400 group-hover:text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                        Painel Admin
+                    </a>
                 </div>
             </div>
-        </div>
-    </nav>
-
-    <!-- Main Content -->
-    <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-        {% if messages %}
-            {% for message in messages %}
-                <div class="mb-4 rounded-md bg-green-50 p-4">
-                    <div class="flex">
-                        <div class="ml-3">
-                            <p class="text-sm font-medium text-green-800">
-                                {{ message }}
-                            </p>
-                        </div>
-                    </div>
+        </nav>
+        
+        <!-- Informações da Instituição Ativa -->
+        {% if instituicao_ativa %}
+        <div class="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-200 bg-gray-50">
+            <div class="flex items-center space-x-3">
+                <div 
+                    class="w-3 h-3 rounded-full border border-white shadow-sm"
+                    style="background-color: {{ instituicao_ativa.cor_tema }};"
+                ></div>
+                <div class="flex-1 min-w-0">
+                    <p class="text-sm font-medium text-gray-900 truncate">{{ instituicao_ativa.nome }}</p>
+                    {% if instituicao_ativa.sigla %}
+                        <p class="text-xs text-gray-500">{{ instituicao_ativa.sigla }}</p>
+                    {% endif %}
                 </div>
-            {% endfor %}
-        {% endif %}
-
-        <div class="px-4 py-6 sm:px-0">
-            {% block content %}
-            {% endblock %}
+            </div>
+            <div class="mt-3">
+                <a href="{% url 'selecionar_instituicao' %}" class="w-full inline-flex items-center justify-center px-3 py-2 border border-gray-300 shadow-sm text-xs font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors" style="--tw-ring-color: {{ instituicao_ativa.cor_tema }};">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path>
+                    </svg>
+                    Trocar Instituição
+                </a>
+            </div>
         </div>
+        {% endif %}
+    </div>
+
+    <!-- Overlay for mobile -->
+    <div id="sidebar-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden hidden"></div>
+
+    <!-- Main content area -->
+    <div class="flex-1 lg:ml-64">
+        <!-- Top header -->
+        <header class="bg-white shadow-sm border-b border-gray-200 lg:hidden">
+            <div class="flex items-center justify-between h-16 px-4">
+                <button id="sidebar-toggle" class="p-2 rounded-md text-gray-400 hover:text-gray-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                    </svg>
+                </button>
+                <h1 class="text-lg font-semibold text-gray-900">{% block page_title %}Sistema PDTIC{% endblock %}</h1>
+                <div></div>
+            </div>
+        </header>
+
+        <!-- Page content -->
+        <main class="flex-1">
+            {% if messages %}
+                <div class="p-4">
+                    {% for message in messages %}
+                        <div class="mb-4 rounded-md bg-green-50 p-4">
+                            <div class="flex">
+                                <div class="ml-3">
+                                    <p class="text-sm font-medium text-green-800">
+                                        {{ message }}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <div class="p-6">
+                {% block content %}
+                {% endblock %}
+            </div>
+        </main>
     </div>
 
     <!-- Modal Container -->
@@ -222,6 +346,93 @@
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape' && !modal.container.classList.contains('hidden')) {
                 modal.close();
+            }
+        });
+
+        // Sidebar functionality
+        const sidebar = document.getElementById('sidebar');
+        const sidebarToggle = document.getElementById('sidebar-toggle');
+        const sidebarClose = document.getElementById('sidebar-close');
+        const sidebarOverlay = document.getElementById('sidebar-overlay');
+
+        function openSidebar() {
+            sidebar.classList.remove('-translate-x-full');
+            sidebarOverlay.classList.remove('hidden');
+            document.body.classList.add('overflow-hidden');
+        }
+
+        function closeSidebar() {
+            sidebar.classList.add('-translate-x-full');
+            sidebarOverlay.classList.add('hidden');
+            document.body.classList.remove('overflow-hidden');
+        }
+
+        // Toggle sidebar on mobile
+        if (sidebarToggle) {
+            sidebarToggle.addEventListener('click', openSidebar);
+        }
+
+        if (sidebarClose) {
+            sidebarClose.addEventListener('click', closeSidebar);
+        }
+
+        if (sidebarOverlay) {
+            sidebarOverlay.addEventListener('click', closeSidebar);
+        }
+
+        // Close sidebar on mobile when clicking a link
+        const sidebarLinks = sidebar.querySelectorAll('a');
+        sidebarLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                if (window.innerWidth < 1024) { // lg breakpoint
+                    closeSidebar();
+                }
+            });
+        });
+
+        // Initialize sidebar state for mobile
+        if (window.innerWidth < 1024) {
+            sidebar.classList.add('-translate-x-full');
+        }
+
+        // Highlight active menu item
+        function setActiveMenuItem() {
+            const currentPath = window.location.pathname;
+            const menuItems = sidebar.querySelectorAll('nav a');
+            
+            menuItems.forEach(item => {
+                const itemPath = new URL(item.href).pathname;
+                
+                // Remove active classes
+                item.classList.remove('bg-primary-100', 'text-primary-700', 'border-primary-500');
+                item.classList.add('text-gray-700');
+                
+                // Check if current path starts with item path (for nested routes)
+                if (currentPath === itemPath || (itemPath !== '/' && currentPath.startsWith(itemPath))) {
+                    item.classList.remove('text-gray-700', 'hover:text-gray-900', 'hover:bg-gray-100');
+                    item.classList.add('bg-primary-100', 'text-primary-700');
+                    
+                    // Highlight the icon too
+                    const icon = item.querySelector('svg');
+                    if (icon) {
+                        icon.classList.remove('text-gray-400', 'group-hover:text-gray-500');
+                        icon.classList.add('text-primary-500');
+                    }
+                }
+            });
+        }
+
+        // Set active menu item on page load
+        setActiveMenuItem();
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            if (window.innerWidth >= 1024) {
+                sidebar.classList.remove('-translate-x-full');
+                sidebarOverlay.classList.add('hidden');
+                document.body.classList.remove('overflow-hidden');
+            } else {
+                sidebar.classList.add('-translate-x-full');
             }
         });
     </script>

@@ -6,7 +6,11 @@ from .forms import PDTICForm, VersaoPDTICForm
 from instituicoes.models import Instituicao
 
 def pdtic_list(request):
-    planos = PDTIC.objects.all()
+    # Filtra PDTICs pela instituição ativa
+    if hasattr(request, 'instituicao_ativa'):
+        planos = PDTIC.objects.filter(instituicao=request.instituicao_ativa)
+    else:
+        planos = PDTIC.objects.all()
     return render(request, "pdtic/pdtic_list.html", {"planos": planos})
 
 def pdtic_list_by_instituicao(request, instituicao_pk):
@@ -18,18 +22,30 @@ def pdtic_list_by_instituicao(request, instituicao_pk):
     })
 
 def pdtic_detail(request, pk):
-    plano = get_object_or_404(PDTIC, pk=pk)
+    # Filtra PDTIC pela instituição ativa
+    if hasattr(request, 'instituicao_ativa'):
+        plano = get_object_or_404(PDTIC, pk=pk, instituicao=request.instituicao_ativa)
+    else:
+        plano = get_object_or_404(PDTIC, pk=pk)
     return render(request, "pdtic/pdtic_detail.html", {"plano": plano})
 
 def pdtic_create(request):
+    instituicao_ativa = getattr(request, 'instituicao_ativa', None)
+    
     if request.method == "POST":
-        form = PDTICForm(request.POST)
+        form = PDTICForm(request.POST, instituicao_ativa=instituicao_ativa)
         if form.is_valid():
-            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-                form.save()
-                return JsonResponse({'success': True})
+            # Define a instituição ativa automaticamente
+            if instituicao_ativa:
+                pdtic = form.save(commit=False)
+                pdtic.instituicao = instituicao_ativa
+                pdtic.save()
             else:
                 form.save()
+            
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return JsonResponse({'success': True})
+            else:
                 return redirect("pdtic_list")
         else:
             if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
@@ -38,7 +54,8 @@ def pdtic_create(request):
             else:
                 return render(request, "pdtic/pdtic_form.html", {"form": form})
     else:
-        form = PDTICForm()
+        # Cria form com instituição ativa se disponível
+        form = PDTICForm(instituicao_ativa=instituicao_ativa)
     
     if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
         return render(request, "pdtic/pdtic_form_modal.html", {"form": form})
@@ -46,9 +63,16 @@ def pdtic_create(request):
 
 
 def pdtic_update(request, pk):
-    plano = get_object_or_404(PDTIC, pk=pk)
+    instituicao_ativa = getattr(request, 'instituicao_ativa', None)
+    
+    # Garante que só pode editar PDTICs da instituição ativa
+    if instituicao_ativa:
+        plano = get_object_or_404(PDTIC, pk=pk, instituicao=instituicao_ativa)
+    else:
+        plano = get_object_or_404(PDTIC, pk=pk)
+        
     if request.method == "POST":
-        form = PDTICForm(request.POST, instance=plano)
+        form = PDTICForm(request.POST, instance=plano, instituicao_ativa=instituicao_ativa)
         if form.is_valid():
             if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
                 form.save()
@@ -63,7 +87,7 @@ def pdtic_update(request, pk):
             else:
                 return render(request, "pdtic/pdtic_form.html", {"form": form, "object": plano})
     else:
-        form = PDTICForm(instance=plano)
+        form = PDTICForm(instance=plano, instituicao_ativa=instituicao_ativa)
     
     if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
         return render(request, "pdtic/pdtic_form_modal.html", {"form": form, "object": plano})
