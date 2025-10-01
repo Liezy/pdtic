@@ -40,6 +40,7 @@ pipx==1.7.1
 platformdirs==4.3.6
 psycopg2==2.9.10
 pydantic==2.11.7
+python-decouple==3.8
 pydantic_core==2.33.2
 pyinstaller==6.11.1
 pyinstaller-hooks-contrib==2024.10
