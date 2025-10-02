@@ -22,7 +22,7 @@ docker run hello-world
 
 ## 🚀 Executando o Sistema PDTIC
 
-### Método 1: Sistema Completo (Recomendado)
+### Sistema Completo (Recomendado)
 
 ```bash
 # 1. Clonar o repositório (se ainda não fez)
@@ -34,38 +34,6 @@ docker-compose up --build
 
 # Ou em modo detached (background)
 docker-compose up --build -d
-```
-
-### Método 2: Apenas Banco de Dados
-
-```bash
-# Iniciar apenas o PostgreSQL
-docker-compose up -d db
-
-# Aguardar inicialização (cerca de 10-15 segundos)
-sleep 15
-
-# Verificar se o banco está funcionando
-docker-compose exec db psql -U pdtic_user -d pdtic_db -c "SELECT version();"
-```
-
-### Método 3: Desenvolvimento Local + Banco Docker
-
-```bash
-# 1. Iniciar apenas o banco
-docker-compose up -d db
-
-# 2. Ativar ambiente virtual local
-source venv/bin/activate
-
-# 3. Instalar dependências locais
-pip install -r requirements.txt
-
-# 4. Executar migrações
-python manage.py migrate
-
-# 5. Iniciar servidor Django
-python manage.py runserver
 ```
 
 ## 🌐 Acessando o Sistema
@@ -227,7 +195,7 @@ docker stats
 docker system prune --volumes -f
 ```
 
-## � Estrutura dos Containers
+## 📁 Estrutura dos Containers
 
 ```
 pdtic/
