@@ -5,61 +5,126 @@ class Command(BaseCommand):
     help = 'Popula o banco de dados com instituições e unidades administrativas de exemplo'
 
     def handle(self, *args, **options):
-        # Dados de exemplo para instituições e suas unidades
+        # Dados reais de instituições públicas brasileiras e suas unidades administrativas
         instituicoes_data = [
             {
-                'nome': 'Universidade Federal do Rio de Janeiro',
-                'sigla': 'UFRJ',
-                'cor_tema': '#FF0000',
+                'nome': 'Ministério da Fazenda',
+                'sigla': 'MF',
+                'cor_tema': '#1E3A8A',  # Azul institucional
                 'unidades': [
-                    'Faculdade de Engenharia',
-                    'Instituto de Matemática',
-                    'Instituto de Física',
-                    'Faculdade de Medicina',
+                    'Secretaria Executiva',
+                    'Secretaria do Tesouro Nacional',
+                    'Receita Federal do Brasil',
+                    'Secretaria de Política Econômica',
+                    'Procuradoria-Geral da Fazenda Nacional',
+                    'Conselho Administrativo de Recursos Fiscais',
+                    'Escola de Administração Fazendária',
+                    'Secretaria de Avaliação, Planejamento, Energia e Loteria',
                 ],
             },
             {
-                'nome': 'Universidade de São Paulo',
-                'sigla': 'USP',
-                'cor_tema': '#0000FF',
+                'nome': 'Tribunal de Contas da União',
+                'sigla': 'TCU',
+                'cor_tema': '#059669',  # Verde institucional
                 'unidades': [
-                    'Faculdade de Direito',
-                    'Instituto de Química',
-                    'Escola de Engenharia de São Carlos',
-                    'Faculdade de Economia',
+                    'Presidência',
+                    'Secretaria-Geral de Controle Externo',
+                    'Secretaria-Geral da Presidência',
+                    'Secretaria-Geral de Administração',
+                    'Instituto Serzedello Corrêa',
+                    'Secretaria de Controle Externo da Administração do Estado',
+                    'Secretaria de Controle Externo de Aquisições Logísticas',
+                    'Secretaria de Tecnologia da Informação',
                 ],
             },
             {
-                'nome': 'Universidade Estadual de Campinas',
-                'sigla': 'UNICAMP',
-                'cor_tema': '#00FF00',
+                'nome': 'Banco Central do Brasil',
+                'sigla': 'BACEN',
+                'cor_tema': '#DC2626',  # Vermelho institucional
                 'unidades': [
-                    'Instituto de Computação',
-                    'Faculdade de Engenharia Mecânica',
-                    'Instituto de Biologia',
-                    'Faculdade de Ciências Médicas',
+                    'Diretoria Colegiada',
+                    'Departamento de Tecnologia da Informação',
+                    'Departamento de Operações Bancárias e de Sistema de Pagamentos',
+                    'Departamento de Organização do Sistema Financeiro',
+                    'Departamento de Regulação do Sistema Financeiro',
+                    'Departamento de Supervisão de Conduta',
+                    'Departamento de Relacionamento com Investidores e Estudos Especiais',
+                    'Departamento de Assuntos Internacionais',
                 ],
             },
             {
-                'nome': 'Pontifícia Universidade Católica do Rio de Janeiro',
-                'sigla': 'PUC-Rio',
-                'cor_tema': '#FFFF00',
+                'nome': 'Instituto Nacional do Seguro Social',
+                'sigla': 'INSS',
+                'cor_tema': '#7C3AED',  # Roxo institucional
                 'unidades': [
-                    'Departamento de Engenharia Elétrica',
-                    'Departamento de Matemática',
-                    'Faculdade de Direito',
-                    'Centro Técnico Científico',
+                    'Presidência',
+                    'Diretoria de Benefícios',
+                    'Diretoria de Atendimento',
+                    'Diretoria de Tecnologia da Informação',
+                    'Procuradoria Federal Especializada',
+                    'Auditoria Interna',
+                    'Corregedoria-Geral',
+                    'Superintendências Regionais',
                 ],
             },
             {
-                'nome': 'Instituto Tecnológico de Aeronáutica',
-                'sigla': 'ITA',
-                'cor_tema': '#FF00FF',
+                'nome': 'Controladoria-Geral da União',
+                'sigla': 'CGU',
+                'cor_tema': '#B45309',  # Laranja institucional
                 'unidades': [
-                    'Divisão de Engenharia Aeronáutica',
-                    'Divisão de Engenharia Eletrônica',
-                    'Divisão de Engenharia Mecânica',
-                    'Centro de Pesquisa',
+                    'Ministro de Estado',
+                    'Secretaria de Combate à Corrupção',
+                    'Secretaria Federal de Controle Interno',
+                    'Secretaria de Transparência e Prevenção da Corrupção',
+                    'Ouvidoria-Geral da União',
+                    'Corregedoria-Geral da União',
+                    'Controladoria Regional da União no Distrito Federal',
+                    'Coordenação-Geral de Recursos Logísticos',
+                ],
+            },
+            {
+                'nome': 'Agência Nacional de Telecomunicações',
+                'sigla': 'ANATEL',
+                'cor_tema': '#0891B2',  # Ciano institucional
+                'unidades': [
+                    'Conselho Diretor',
+                    'Superintendência de Competição',
+                    'Superintendência de Controle de Obrigações',
+                    'Superintendência de Outorga e Recursos à Prestação',
+                    'Superintendência de Fiscalização',
+                    'Superintendência de Planejamento e Regulamentação',
+                    'Superintendência de Gestão Interna',
+                    'Procuradoria Federal Especializada',
+                ],
+            },
+            {
+                'nome': 'Empresa Brasileira de Correios e Telégrafos',
+                'sigla': 'ECT',
+                'cor_tema': '#FACC15',  # Amarelo dos Correios
+                'unidades': [
+                    'Presidência',
+                    'Diretoria Regional São Paulo Metropolitana',
+                    'Diretoria Regional Rio de Janeiro',
+                    'Diretoria Regional Brasília',
+                    'Diretoria de Tecnologia e Inovação',
+                    'Diretoria de Gestão de Pessoas',
+                    'Diretoria de Administração e Finanças',
+                    'Diretoria de Negócios',
+                ],
+            },
+            {
+                'nome': 'Instituto Nacional de Tecnologia da Informação',
+                'sigla': 'ITI',
+                'cor_tema': '#6366F1',  # Índigo tecnológico
+                'unidades': [
+                    'Presidência',
+                    'Diretoria de Políticas e Tecnologias da Informação',
+                    'Diretoria de Infraestrutura de Chaves Públicas',
+                    'Coordenação-Geral de Certificação Digital',
+                    'Coordenação-Geral de Segurança Cibernética',
+                    'Coordenação-Geral de Identidade Digital',
+                    'Assessoria de Gestão Estratégica',
+                    'Centro de Pesquisa e Desenvolvimento',
                 ],
             },
         ]

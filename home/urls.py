@@ -1,6 +1,7 @@
 from django.urls import path
-from .views import HomeView
+from .views import HomeView, LandingPageView
 
 urlpatterns = [
-    path('', HomeView.as_view(), name='home'),
+    path('', LandingPageView.as_view(), name='landing'),
+    path('dashboard/', HomeView.as_view(), name='home'),
 ]

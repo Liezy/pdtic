@@ -20,6 +20,10 @@ class InstituicaoMiddleware:
             '/static/',
             '/media/',
         ]
+        # URLs específicas que devem ser acessíveis sem instituição (landing page)
+        self.landing_urls = [
+            '/',  # Landing page na raiz
+        ]
         # URLs que são APENAS para modo administrativo (sem instituição ativa)
         self.admin_only_paths = [
             '/instituicoes/',  # Lista de instituições é só para admins
@@ -33,7 +37,7 @@ class InstituicaoMiddleware:
     def __call__(self, request):
         # Verifica se a URL está isenta da verificação
         path = request.path
-        if any(path.startswith(url) for url in self.exempt_urls):
+        if any(path.startswith(url) for url in self.exempt_urls) or path in self.landing_urls:
             response = self.get_response(request)
             return response
 

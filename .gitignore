@@ -41,6 +41,9 @@ coverage.xml
 **/migrations/*.pyc
 **/migrations/__pycache__/
 
+# PostgreSQL data
+postgres_data/
+
 # Outros
 *.bak
 *.swp

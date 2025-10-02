@@ -4,6 +4,14 @@ from django.urls import reverse_lazy
 from django.db.models import Count, Q
 from datetime import datetime, timedelta
 
+class LandingPageView(TemplateView):
+    template_name = 'home/landing.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['current_year'] = datetime.now().year
+        return context
+
 class HomeView(TemplateView):
     template_name = 'home/index.html'
 

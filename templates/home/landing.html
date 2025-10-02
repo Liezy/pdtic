@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema PDTIC - Gestão de Planos Diretores de TIC</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .header-bg { background: #1e40af; }
+        .section-bg { background: #f8fafc; }
+    </style>
+</head>
+
+<body class="bg-gray-100">
+    <!-- Header simples -->
+    <header class="header-bg text-white">
+        <div class="max-w-6xl mx-auto px-4 py-4">
+            <div class="flex justify-between items-center">
+                <h1 class="text-xl font-bold">Sistema PDTIC</h1>
+                <a href="{% url 'home' %}" class="bg-white text-blue-700 px-4 py-2 rounded hover:bg-gray-100">
+                    Entrar
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Seção principal -->
+    <section class="header-bg text-white py-16">
+        <div class="max-w-4xl mx-auto px-4 text-center">
+            <h2 class="text-3xl md:text-4xl font-bold mb-6">
+                Gestão de PDTICs para Órgãos Públicos
+            </h2>
+            <p class="text-lg mb-8 text-blue-100">
+                Sistema desenvolvido para facilitar a elaboração, controle e acompanhamento dos 
+                Planos Diretores de Tecnologia da Informação e Comunicação conforme as diretrizes governamentais.
+            </p>
+            <a href="{% url 'home' %}" class="bg-white text-blue-700 px-6 py-3 rounded-lg font-medium hover:bg-gray-100 inline-block">
+                Acessar Sistema
+            </a>
+        </div>
+    </section>
+
+    <!-- O que é o sistema -->
+    <section class="py-12 bg-white">
+        <div class="max-w-4xl mx-auto px-4">
+            <div class="grid md:grid-cols-2 gap-8 items-center">
+                <div>
+                    <h3 class="text-2xl font-bold text-gray-900 mb-4">
+                        O que faz este sistema?
+                    </h3>
+                    <p class="text-gray-700 mb-4">
+                        Permite criar, editar e gerenciar os PDTICs da sua instituição de forma organizada, 
+                        com controle de versões e acompanhamento do status de cada plano.
+                    </p>
+                    <p class="text-gray-700">
+                        Desenvolvido especificamente para atender as necessidades do setor público brasileiro, 
+                        seguindo as diretrizes do Decreto nº 10.332/2020.
+                    </p>
+                </div>
+                <div class="bg-gray-100 p-6 rounded">
+                    <h4 class="font-semibold mb-3">Principais recursos:</h4>
+                    <ul class="space-y-2 text-sm text-gray-700">
+                        <li>• Cadastro e gestão de instituições e unidades</li>
+                        <li>• Criação e edição de PDTICs por instituição</li>
+                        <li>• Controle de versões e histórico de alterações</li>
+                        <li>• Dashboard com métricas e acompanhamento</li>
+                        <li>• Sistema de aprovação e publicação</li>
+                        <li>• Relatórios para gestão e compliance</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Como usar -->
+    <section class="section-bg py-12">
+        <div class="max-w-4xl mx-auto px-4 text-center">
+            <h3 class="text-2xl font-bold text-gray-900 mb-8">
+                Como usar o sistema
+            </h3>
+            <div class="grid md:grid-cols-3 gap-6">
+                <div class="bg-white p-6 rounded shadow">
+                    <div class="text-blue-600 text-3xl font-bold mb-2">1</div>
+                    <h4 class="font-semibold mb-2">Acesse o Sistema</h4>
+                    <p class="text-gray-600 text-sm">
+                        Clique em "Entrar" e selecione sua instituição para começar
+                    </p>
+                </div>
+                <div class="bg-white p-6 rounded shadow">
+                    <div class="text-blue-600 text-3xl font-bold mb-2">2</div>
+                    <h4 class="font-semibold mb-2">Gerencie seus PDTICs</h4>
+                    <p class="text-gray-600 text-sm">
+                        Crie novos planos ou edite os existentes com interface simples
+                    </p>
+                </div>
+                <div class="bg-white p-6 rounded shadow">
+                    <div class="text-blue-600 text-3xl font-bold mb-2">3</div>
+                    <h4 class="font-semibold mb-2">Acompanhe o Progresso</h4>
+                    <p class="text-gray-600 text-sm">
+                        Use o dashboard para monitorar status e gerar relatórios
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Call to action final -->
+    <section class="header-bg text-white py-12">
+        <div class="max-w-4xl mx-auto px-4 text-center">
+            <h3 class="text-2xl font-bold mb-4">
+                Pronto para começar?
+            </h3>
+            <p class="mb-6 text-blue-100">
+                Acesse o sistema e comece a gerenciar os PDTICs da sua instituição hoje mesmo.
+            </p>
+            <a href="{% url 'home' %}" class="bg-white text-blue-700 px-6 py-3 rounded-lg font-medium hover:bg-gray-100 inline-block">
+                Entrar no Sistema
+            </a>
+        </div>
+    </section>
+
+    <!-- Footer simples -->
+    <footer class="bg-gray-800 text-gray-300 py-8">
+        <div class="max-w-4xl mx-auto px-4">
+            <div class="grid md:grid-cols-2 gap-6">
+                <div>
+                    <h4 class="font-semibold text-white mb-2">Sistema PDTIC</h4>
+                    <p class="text-sm">
+                        Ferramenta para gestão de Planos Diretores de Tecnologia da Informação e Comunicação 
+                        em conformidade com as diretrizes do governo federal.
+                    </p>
+                </div>
+                <div>
+                    <h4 class="font-semibold text-white mb-2">Links Úteis</h4>
+                    <ul class="text-sm space-y-1">
+                        <li><a href="{% url 'home' %}" class="hover:text-white">Dashboard</a></li>
+                        <li><a href="/admin/" class="hover:text-white">Administração</a></li>
+                        <li><a href="https://www.gov.br/governodigital/pt-br/estrategia-de-governanca-digital/pdtic" target="_blank" class="hover:text-white">Legislação PDTIC</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-gray-700 mt-6 pt-6 text-center text-sm">
+                <p>&copy; {{ current_year }} Sistema PDTIC</p>
+            </div>
+        </div>
+    </footer>
+
+
+</body>
+</html>

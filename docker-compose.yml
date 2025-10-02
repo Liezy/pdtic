@@ -10,7 +10,7 @@ services:
       POSTGRES_USER: pdtic_user
       POSTGRES_PASSWORD: pdtic_password
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - ./postgres_data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
 
@@ -36,5 +36,4 @@ services:
       - db
 
 volumes:
-  postgres_data:
   static_volume:
