@@ -2,7 +2,10 @@ from django.shortcuts import render
 from django.views.generic import TemplateView
 from django.urls import reverse_lazy
 from django.db.models import Count, Q
+from django.http import JsonResponse
+from django.views import View
 from datetime import datetime, timedelta
+import json
 
 class LandingPageView(TemplateView):
     template_name = 'home/landing.html'
@@ -66,3 +69,77 @@ class HomeView(TemplateView):
             ).order_by('-total_pdtics')[:5]
             
         return context
+
+
+class CalendarEventsView(View):
+    """View para fornecer eventos para o FullCalendar"""
+    
+    def get(self, request, *args, **kwargs):
+        from pdtic.models import PDTIC
+        
+        # Pega parâmetros de data do FullCalendar
+        start_date = request.GET.get('start')
+        end_date = request.GET.get('end')
+        
+        # Filtra eventos baseado na instituição ativa
+        if hasattr(request, 'instituicao_ativa') and request.instituicao_ativa:
+            pdtics = PDTIC.objects.filter(instituicao=request.instituicao_ativa)
+        else:
+            # Modo admin - mostra todos os PDTICs
+            pdtics = PDTIC.objects.all()
+        
+        # Se temos datas de filtro, aplicamos
+        if start_date and end_date:
+            try:
+                start = datetime.fromisoformat(start_date.replace('Z', '+00:00'))
+                end = datetime.fromisoformat(end_date.replace('Z', '+00:00'))
+                # Filtra PDTICs criados no período
+                pdtics = pdtics.filter(criado_em__date__range=[start.date(), end.date()])
+            except ValueError:
+                pass  # Se formato de data inválido, ignora filtro
+        
+        # Converte PDTICs para formato de eventos do FullCalendar
+        events = []
+        for pdtic in pdtics:
+            # Cor do evento baseada no status
+            color_map = {
+                'rascunho': '#6B7280',      # Cinza
+                'elaboracao': '#F59E0B',    # Amarelo
+                'aprovado': '#10B981',      # Verde
+                'publicado': '#3B82F6',     # Azul
+            }
+            
+            event = {
+                'id': str(pdtic.id),
+                'title': pdtic.titulo[:50] + ('...' if len(pdtic.titulo) > 50 else ''),
+                'start': pdtic.criado_em.isoformat(),
+                'color': color_map.get(pdtic.status, '#6B7280'),
+                'extendedProps': {
+                    'status': pdtic.get_status_display(),
+                    'instituicao': pdtic.instituicao.nome if pdtic.instituicao else 'N/A',
+                    'description': f"Status: {pdtic.get_status_display()}\nInstituição: {pdtic.instituicao.nome if pdtic.instituicao else 'N/A'}"
+                }
+            }
+            
+            # Adiciona datas de vencimento se existirem (exemplo de datas fictícias)
+            # Você pode adicionar campos de data no modelo PDTIC conforme necessário
+            if pdtic.status in ['elaboracao', 'aprovado']:
+                # Adiciona um evento de prazo 30 dias após criação (exemplo)
+                prazo_date = pdtic.criado_em + timedelta(days=30)
+                prazo_event = {
+                    'id': f'prazo_{pdtic.id}',
+                    'title': f'Prazo: {pdtic.titulo[:30]}...',
+                    'start': prazo_date.isoformat(),
+                    'color': '#EF4444',  # Vermelho para prazos
+                    'extendedProps': {
+                        'type': 'prazo',
+                        'status': 'Prazo de Conclusão',
+                        'instituicao': pdtic.instituicao.nome if pdtic.instituicao else 'N/A',
+                        'description': f"Prazo de conclusão do PDTIC\n{pdtic.titulo}"
+                    }
+                }
+                events.append(prazo_event)
+            
+            events.append(event)
+        
+        return JsonResponse(events, safe=False)

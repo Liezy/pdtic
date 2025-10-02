@@ -315,6 +315,29 @@
         </div>
     {% endif %}
 
+        <!-- Calendário de Eventos -->
+        <div class="bg-white shadow rounded-lg p-4 lg:p-6 mb-6 lg:mb-8">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-medium text-gray-900">Calendário de PDTICs</h3>
+                <div class="flex space-x-2">
+                    <button id="calendar-today" class="px-3 py-1 text-sm bg-gray-100 text-gray-700 rounded hover:bg-gray-200 transition-colors">
+                        Hoje
+                    </button>
+                    <button id="calendar-prev" class="p-1 text-gray-600 hover:text-gray-900 rounded hover:bg-gray-100 transition-colors">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                        </svg>
+                    </button>
+                    <button id="calendar-next" class="p-1 text-gray-600 hover:text-gray-900 rounded hover:bg-gray-100 transition-colors">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            <div id="calendar" class="fc-theme-standard"></div>
+        </div>
+
         <!-- Gráficos Home -->
         <div class="grid grid-cols-1 gap-6 lg:grid-cols-2 mb-8">
             <!-- Gráfico de PDTICs por Status -->
@@ -345,7 +368,196 @@
         </div>
     </div>
 
-    <!-- Scripts dos Gráficos -->
+    <!-- Scripts dos Gráficos e Calendário -->
+    <script>
+        // Inicializar FullCalendar
+        document.addEventListener('DOMContentLoaded', function() {
+            const calendarEl = document.getElementById('calendar');
+            
+            if (calendarEl) {
+                const calendar = new FullCalendar.Calendar(calendarEl, {
+                    // Configurações básicas
+                    initialView: 'dayGridMonth',
+                    locale: 'pt-br',
+                    headerToolbar: {
+                        left: '',
+                        center: 'title',
+                        right: ''
+                    },
+                    height: 'auto',
+                    
+                    // Configurações de eventos
+                    events: {
+                        url: '{% url "calendar_events" %}',
+                        failure: function() {
+                            alert('Erro ao carregar eventos do calendário');
+                        }
+                    },
+                    
+                    // Configurações de aparência
+                    eventDisplay: 'block',
+                    dayMaxEvents: 3,
+                    moreLinkClick: 'popover',
+                    
+                    // Tooltip e interação
+                    eventMouseEnter: function(info) {
+                        // Criar tooltip
+                        const tooltip = document.createElement('div');
+                        tooltip.className = 'fc-tooltip bg-gray-900 text-white p-3 rounded-lg shadow-lg text-sm max-w-xs z-50';
+                        tooltip.style.position = 'absolute';
+                        tooltip.style.zIndex = '9999';
+                        tooltip.innerHTML = `
+                            <div class="font-semibold">${info.event.title}</div>
+                            <div class="text-gray-300 mt-1">${info.event.extendedProps.description || ''}</div>
+                        `;
+                        
+                        document.body.appendChild(tooltip);
+                        
+                        // Posicionar tooltip
+                        const rect = info.el.getBoundingClientRect();
+                        tooltip.style.left = rect.left + window.scrollX + 'px';
+                        tooltip.style.top = rect.bottom + window.scrollY + 5 + 'px';
+                        
+                        // Armazenar referência para remover depois
+                        info.el._tooltip = tooltip;
+                    },
+                    
+                    eventMouseLeave: function(info) {
+                        if (info.el._tooltip) {
+                            document.body.removeChild(info.el._tooltip);
+                            info.el._tooltip = null;
+                        }
+                    },
+                    
+                    // Clique em evento
+                    eventClick: function(info) {
+                        // Se for um PDTIC (não um prazo), abrir detalhes
+                        if (!info.event.extendedProps.type) {
+                            const pdticId = info.event.id;
+                            // Redirecionar para detalhes do PDTIC
+                            window.location.href = `/pdtic/${pdticId}/`;
+                        }
+                    },
+                    
+                    // Configurações de data
+                    dateClick: function(info) {
+                        // Opcional: ação ao clicar em uma data
+                        console.log('Data clicada:', info.dateStr);
+                    },
+                    
+                    // Estilização dos eventos
+                    eventDidMount: function(info) {
+                        // Adicionar classes CSS customizadas baseadas no tipo de evento
+                        if (info.event.extendedProps.type === 'prazo') {
+                            info.el.classList.add('fc-event-prazo');
+                            info.el.style.borderLeft = '4px solid #EF4444';
+                        } else {
+                            info.el.classList.add('fc-event-pdtic');
+                        }
+                        
+                        // Adicionar classes baseadas no status
+                        const status = info.event.extendedProps.status;
+                        if (status) {
+                            info.el.classList.add(`fc-event-${status.toLowerCase().replace(' ', '-')}`);
+                        }
+                    }
+                });
+                
+                // Renderizar o calendário
+                calendar.render();
+                
+                // Conectar botões customizados
+                document.getElementById('calendar-prev')?.addEventListener('click', function() {
+                    calendar.prev();
+                });
+                
+                document.getElementById('calendar-next')?.addEventListener('click', function() {
+                    calendar.next();
+                });
+                
+                document.getElementById('calendar-today')?.addEventListener('click', function() {
+                    calendar.today();
+                });
+                
+                // Tornar o calendário disponível globalmente (para debug)
+                window.pdticCalendar = calendar;
+            }
+        });
+    </script>
+    
+    <!-- Estilos customizados para o calendário -->
+    <style>
+        /* Customização do FullCalendar */
+        .fc-theme-standard .fc-scrollgrid {
+            border: 1px solid #e5e7eb;
+        }
+        
+        .fc .fc-button-primary {
+            background-color: var(--cor-tema, #3B82F6);
+            border-color: var(--cor-tema, #3B82F6);
+        }
+        
+        .fc .fc-button-primary:hover {
+            background-color: var(--cor-tema-600, #2563eb);
+            border-color: var(--cor-tema-600, #2563eb);
+        }
+        
+        .fc .fc-button-primary:focus {
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        
+        .fc-event-pdtic {
+            cursor: pointer;
+        }
+        
+        .fc-event-pdtic:hover {
+            opacity: 0.8;
+        }
+        
+        .fc-event-prazo {
+            font-style: italic;
+            opacity: 0.9;
+        }
+        
+        .fc-tooltip {
+            font-family: 'Inter', system-ui, sans-serif;
+        }
+        
+        .fc .fc-daygrid-event {
+            border-radius: 4px;
+            font-size: 0.75rem;
+        }
+        
+        .fc .fc-daygrid-day-number {
+            color: #374151;
+            font-weight: 500;
+        }
+        
+        .fc .fc-col-header-cell-cushion {
+            color: #6B7280;
+            font-weight: 600;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.025em;
+        }
+        
+        .fc .fc-day-today {
+            background-color: rgba(59, 130, 246, 0.05) !important;
+        }
+        
+        .fc .fc-day-today .fc-daygrid-day-number {
+            background-color: var(--cor-tema, #3B82F6);
+            color: white;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 2px;
+        }
+    </style>
+    
     <script>
         // Dados fictícios
         const homeData = {
