@@ -1,13 +1,7 @@
 from django.urls import path
 from .views import *
-from .instituicao_views import SelecionarInstituicaoView, ativar_instituicao, trocar_instituicao
 
 urlpatterns = [
-    # URLs Seleção de Instituição
-    path('selecionar/', SelecionarInstituicaoView.as_view(), name='selecionar_instituicao'),
-    path('ativar/<int:instituicao_id>/', ativar_instituicao, name='ativar_instituicao'),
-    path('trocar/', trocar_instituicao, name='trocar_instituicao'),
-    
     # URLs Instituição
     path('', InstituicaoList.as_view(), name='instituicao_list'),
     path('<int:pk>/', InstituicaoDetail.as_view(), name='instituicao_detail'),

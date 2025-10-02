@@ -6,11 +6,12 @@ from .forms import PDTICForm, VersaoPDTICForm
 from instituicoes.models import Instituicao
 
 def pdtic_list(request):
-    # Filtra PDTICs pela instituição ativa
+    # SEMPRE filtra PDTICs pela instituição ativa (esta view é específica da instituição)
     if hasattr(request, 'instituicao_ativa'):
         planos = PDTIC.objects.filter(instituicao=request.instituicao_ativa)
     else:
-        planos = PDTIC.objects.all()
+        # Se não há instituição ativa, não mostra nada (modo administrativo usa o Django Admin)
+        planos = PDTIC.objects.none()
     return render(request, "pdtic/pdtic_list.html", {"planos": planos})
 
 def pdtic_list_by_instituicao(request, instituicao_pk):
@@ -22,11 +23,13 @@ def pdtic_list_by_instituicao(request, instituicao_pk):
     })
 
 def pdtic_detail(request, pk):
-    # Filtra PDTIC pela instituição ativa
+    # SEMPRE filtra PDTIC pela instituição ativa (esta view é específica da instituição)
     if hasattr(request, 'instituicao_ativa'):
         plano = get_object_or_404(PDTIC, pk=pk, instituicao=request.instituicao_ativa)
     else:
-        plano = get_object_or_404(PDTIC, pk=pk)
+        # Se não há instituição ativa, nega acesso
+        from django.http import Http404
+        raise Http404("Acesso negado - selecione uma instituição")
     return render(request, "pdtic/pdtic_detail.html", {"plano": plano})
 
 def pdtic_create(request):
@@ -65,11 +68,13 @@ def pdtic_create(request):
 def pdtic_update(request, pk):
     instituicao_ativa = getattr(request, 'instituicao_ativa', None)
     
-    # Garante que só pode editar PDTICs da instituição ativa
+    # SEMPRE garante que só pode editar PDTICs da instituição ativa
     if instituicao_ativa:
         plano = get_object_or_404(PDTIC, pk=pk, instituicao=instituicao_ativa)
     else:
-        plano = get_object_or_404(PDTIC, pk=pk)
+        # Se não há instituição ativa, nega acesso
+        from django.http import Http404
+        raise Http404("Acesso negado - selecione uma instituição")
         
     if request.method == "POST":
         form = PDTICForm(request.POST, instance=plano, instituicao_ativa=instituicao_ativa)
@@ -96,13 +101,25 @@ def pdtic_update(request, pk):
 
 # Views para gerenciar versões do PDTIC
 def versao_list(request, pdtic_pk):
-    pdtic = get_object_or_404(PDTIC, pk=pdtic_pk)
+    # Garante que o PDTIC pertence à instituição ativa
+    if hasattr(request, 'instituicao_ativa'):
+        pdtic = get_object_or_404(PDTIC, pk=pdtic_pk, instituicao=request.instituicao_ativa)
+    else:
+        from django.http import Http404
+        raise Http404("Acesso negado - selecione uma instituição")
+    
     versoes = pdtic.versoes.all().order_by('-criado_em')
     return render(request, "pdtic/versao_list.html", {"pdtic": pdtic, "versoes": versoes})
 
 
 def versao_create(request, pdtic_pk):
-    pdtic = get_object_or_404(PDTIC, pk=pdtic_pk)
+    # Garante que o PDTIC pertence à instituição ativa
+    if hasattr(request, 'instituicao_ativa'):
+        pdtic = get_object_or_404(PDTIC, pk=pdtic_pk, instituicao=request.instituicao_ativa)
+    else:
+        from django.http import Http404
+        raise Http404("Acesso negado - selecione uma instituição")
+    
     if request.method == "POST":
         form = VersaoPDTICForm(request.POST, request.FILES)
         if form.is_valid():
@@ -116,13 +133,25 @@ def versao_create(request, pdtic_pk):
 
 
 def versao_detail(request, pdtic_pk, pk):
-    pdtic = get_object_or_404(PDTIC, pk=pdtic_pk)
+    # Garante que o PDTIC pertence à instituição ativa
+    if hasattr(request, 'instituicao_ativa'):
+        pdtic = get_object_or_404(PDTIC, pk=pdtic_pk, instituicao=request.instituicao_ativa)
+    else:
+        from django.http import Http404
+        raise Http404("Acesso negado - selecione uma instituição")
+    
     versao = get_object_or_404(VersaoPDTIC, pk=pk, pdtic=pdtic)
     return render(request, "pdtic/versao_detail.html", {"pdtic": pdtic, "versao": versao})
 
 
 def versao_update(request, pdtic_pk, pk):
-    pdtic = get_object_or_404(PDTIC, pk=pdtic_pk)
+    # Garante que o PDTIC pertence à instituição ativa
+    if hasattr(request, 'instituicao_ativa'):
+        pdtic = get_object_or_404(PDTIC, pk=pdtic_pk, instituicao=request.instituicao_ativa)
+    else:
+        from django.http import Http404
+        raise Http404("Acesso negado - selecione uma instituição")
+    
     versao = get_object_or_404(VersaoPDTIC, pk=pk, pdtic=pdtic)
     if request.method == "POST":
         form = VersaoPDTICForm(request.POST, request.FILES, instance=versao)
@@ -135,7 +164,13 @@ def versao_update(request, pdtic_pk, pk):
 
 
 def versao_delete(request, pdtic_pk, pk):
-    pdtic = get_object_or_404(PDTIC, pk=pdtic_pk)
+    # Garante que o PDTIC pertence à instituição ativa
+    if hasattr(request, 'instituicao_ativa'):
+        pdtic = get_object_or_404(PDTIC, pk=pdtic_pk, instituicao=request.instituicao_ativa)
+    else:
+        from django.http import Http404
+        raise Http404("Acesso negado - selecione uma instituição")
+    
     versao = get_object_or_404(VersaoPDTIC, pk=pk, pdtic=pdtic)
     if request.method == "POST":
         versao.delete()

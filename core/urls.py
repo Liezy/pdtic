@@ -18,12 +18,13 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
-from instituicoes.instituicao_views import SelecionarInstituicaoView, ativar_instituicao
+from instituicoes.instituicao_views import SelecionarInstituicaoView, ativar_instituicao, trocar_instituicao
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('selecionar-instituicao/', SelecionarInstituicaoView.as_view(), name='selecionar_instituicao'),
     path('ativar-instituicao/<int:instituicao_id>/', ativar_instituicao, name='ativar_instituicao'),
+    path('trocar-instituicao/', trocar_instituicao, name='trocar_instituicao'),
     path('', include('home.urls')),
     path('instituicoes/', include('instituicoes.urls')),
     path("pdtic/", include("pdtic.urls")),

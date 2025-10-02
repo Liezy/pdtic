@@ -8,6 +8,20 @@ from .forms import InstituicaoForm, UnidadeAdministrativaForm
 # --- Instituição ---
 class InstituicaoList(ListView):
     model = Instituicao
+    
+    def dispatch(self, request, *args, **kwargs):
+        # Se há instituição ativa, redireciona para o dashboard 
+        # (esta view é só para modo administrativo)
+        if hasattr(request, 'instituicao_ativa') and request.instituicao_ativa:
+            from django.shortcuts import redirect
+            return redirect('home')
+        return super().dispatch(request, *args, **kwargs)
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = 'Gestão de Instituições'
+        context['is_admin_view'] = True
+        return context
 
 class InstituicaoDetail(DetailView):
     model = Instituicao
@@ -98,23 +112,20 @@ class UnidadeList(ListView):
     template_name = 'unidades/unidade_list.html'
     
     def get_queryset(self):
-        # Se vier de uma instituição específica, filtra por ela
-        if 'instituicao_pk' in self.kwargs:
-            return self.model.objects.filter(instituicao_id=self.kwargs['instituicao_pk'])
-        
-        # Se há uma instituição ativa na sessão, filtra por ela
+        # SEMPRE filtra por instituição ativa (esta view é específica da instituição)
         if hasattr(self.request, 'instituicao_ativa'):
             return self.model.objects.filter(instituicao=self.request.instituicao_ativa)
-            
-        return self.model.objects.all()
+        else:
+            # Se não há instituição ativa, não mostra nada (modo administrativo usa o Django Admin)
+            return self.model.objects.none()
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        # Se vier de uma instituição específica, adiciona ela ao contexto
-        if 'instituicao_pk' in self.kwargs:
-            context['instituicao'] = Instituicao.objects.get(pk=self.kwargs['instituicao_pk'])
-        elif hasattr(self.request, 'instituicao_ativa'):
+        if hasattr(self.request, 'instituicao_ativa'):
             context['instituicao'] = self.request.instituicao_ativa
+            context['title'] = f'Unidades - {self.request.instituicao_ativa.nome}'
+        else:
+            context['title'] = 'Unidades'
         return context
 
 class UnidadeCreate(CreateView):
@@ -165,11 +176,15 @@ class UnidadeUpdate(UpdateView):
     
     def get_object(self, queryset=None):
         obj = super().get_object(queryset)
-        # Garante que só pode editar unidades da instituição ativa
+        # SEMPRE garante que só pode editar unidades da instituição ativa
         if hasattr(self.request, 'instituicao_ativa'):
             if obj.instituicao != self.request.instituicao_ativa:
                 from django.http import Http404
-                raise Http404("Unidade não encontrada")
+                raise Http404("Unidade não encontrada para esta instituição")
+        else:
+            # Se não há instituição ativa, nega acesso
+            from django.http import Http404
+            raise Http404("Acesso negado - selecione uma instituição")
         return obj
     
     def get_form_kwargs(self):
