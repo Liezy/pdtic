@@ -28,7 +28,9 @@ RUN chmod +x /app/entrypoint.sh
 
 # Cria um usuário não-root para segurança
 RUN adduser --disabled-password --gecos '' --shell /bin/bash user \
-    && chown -R user:user /app
+    && chown -R user:user /app \
+    && mkdir -p /app/staticfiles \
+    && chown -R user:user /app/staticfiles
 USER user
 
 # Expõe a porta 8000
