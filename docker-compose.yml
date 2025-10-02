@@ -3,7 +3,7 @@ version: '3.8'
 services:
   # Banco de dados PostgreSQL
   db:
-    image: postgres:13
+    image: postgres:15
     restart: unless-stopped
     environment:
       POSTGRES_DB: pdtic_db

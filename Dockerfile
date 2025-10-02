@@ -16,9 +16,9 @@ RUN apt-get update && apt-get install -y \
 # Define o diretório de trabalho
 WORKDIR /app
 
-# Copia e instala as dependências Python
-COPY requirements.txt /app/
-RUN pip install --no-cache-dir -r requirements.txt
+# Copia e instala as dependências Python (versão minimal)
+COPY requirements-minimal.txt /app/
+RUN pip install --no-cache-dir -r requirements-minimal.txt
 
 # Copia o código da aplicação
 COPY . /app/
